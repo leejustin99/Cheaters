@@ -31,10 +31,9 @@ public:
     {
         struct Node *node1;
         node1->value = value;
-        node1->key = key;
         node1->next = NULL;
 
-        if(Table[key].key == 0){
+        if(Table[key].value == ""){
             Table[key] = *node1;
         }
         else
@@ -61,7 +60,6 @@ public:
 
 private:
     struct Node {
-        int key;
         string value;
         Node *next;
     };
