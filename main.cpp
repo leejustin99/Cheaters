@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <cstring>
+#include "HashTable.h"
 using namespace std;
 void print(std::vector<string> const &input);
 /*function... might want it in some class?*/
@@ -32,34 +33,61 @@ int main(int argc, char *argv[])
 {
     string dir = string("sm_doc_set");
     vector<string> files = vector<string>();
-
     getdir(dir,files);
 
     for (unsigned int i = 0;i < files.size();i++) {
         cout << i << files[i] << endl;
     }
 
-    string fl=dir+ "/"+files[3].c_str();
-    ifstream file;
-    file.open(fl.c_str());
-
-    cout<<"a" << endl;
-
     vector<string> chunks;
     chunks.clear();
-    while(!file.eof())
-    {
-        string s;
-        while(chunks.size() < atoi(argv[2]))
-        {
-            file>>s;
-            chunks.push_back(s);
-        }
-        print(chunks);
-        chunks.erase(chunks.begin());
-        cout<<endl;
-        cout<<endl;
-    }
+    int key = 0;
+    HashTable *hm = new HashTable;
+    int count = 0;
+   for(int k = 2; k<files.size(); k++) {
+
+       string fl = dir + "/" + files[k].c_str();
+       ifstream file;
+       file.open(fl.c_str());
+       chunks.clear();
+
+       if(file.is_open() && file.good()) {
+           while (!file.eof()) {
+                cout << "Run: " << count << endl;
+               string s;
+               while (chunks.size() < atoi(argv[2])) {
+                   file >> s;
+                   chunks.push_back(s);
+               }
+               key = HashFunction(chunks);
+               hm->insertItem(files[k].c_str(), key);
+               print(chunks);
+               chunks.erase(chunks.begin());
+               count++;
+           }
+           file.close();
+       }
+
+   }
+
+       int CPA[files.size()][files.size()];
+       for (int i = 0; i < files.size(); i++) {
+
+           for (int j = i + 1; j < files.size(); j++) {
+               CPA[i][j] = hm->CollisionFinder(j, atoi(argv[3]));
+
+           }
+
+       }
+
+
+       for (int i = 0; i < files.size(); i++) {
+           for (int j = i + 1; j < files.size(); j++) {
+               //if (CPA[i][j] != 0) {
+                   cout << CPA[i][j] << ":" << hm->Find(i) <<"  " << hm->Find(j) << endl;
+               //}
+           }
+       }
     return 0;
 }
 
@@ -70,3 +98,7 @@ void print(vector<string> const &input)
         cout << input[i] << endl;
     }
 }
+
+
+
+

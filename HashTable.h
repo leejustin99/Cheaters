@@ -17,19 +17,22 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <cstring>
-#define TABLE_SIZE 1024
+#include <cmath>
+#define TABLE_SIZE 10000
 using namespace std;
+int HashFunction(vector<string> &chunk);
 class HashTable {
 public:
-    HashTable();
+    HashTable(){}
 
-    HashTable(const HashTable &source);
+    HashTable(const HashTable &source){}
 
-    ~HashTable();
 
-    void insertItem(string &value, int key)
+    ~HashTable(){}
+
+    void insertItem(const string &value, int key)
     {
-        struct Node *node1;
+        struct Node *node1 = new struct Node;
         node1->value = value;
         node1->next = NULL;
 
@@ -43,18 +46,29 @@ public:
 
     }
 
-    bool CollisionFinder(int key, string &name , int numbertocheck)
+    int CollisionFinder(int key, int numbertocheck)
     {
+        int count = 0;
+        Node *head = new struct Node;
+        *head = Table[key];
 
-            for(int i=0;i<TABLE_SIZE;i++){
-                if(Table[i].next != NULL){
-                    if(Table[i].next->value != Table[i].value)
-                    {
-                        return true;
-                    }
-                }
+        while(head->next!= NULL){
 
+            if(head->next->value != head->value)
+            {
+
+                count++;
             }
+            head = head->next;
+        }
+        //if(count > numbertocheck)
+            return count;
+        //else
+            //return 0;
+    }
+
+    string Find(int key){
+        return Table[key].value;
     }
 
 
@@ -67,3 +81,28 @@ private:
     struct Node Table[TABLE_SIZE];
 
 };
+
+int HashFunction(vector<string> &chunk)
+{
+    int keyvalue = 0;
+    int sub =0;
+    int power = 0;
+
+    for(int i=0; i<chunk.size()-1; i++){
+        sub = atoi(chunk[chunk.size()-i-1].c_str());
+        power = (int)pow((double)37,(double)i);
+        if ((sub >= 97) && (sub <= 122)) {
+            sub = sub - 32;
+        }else if ((sub >= 48) && (sub <= 57))
+        {
+            sub = sub + 17;
+        }else if(sub == 32)
+        {
+
+        }
+        keyvalue += sub*power;
+    }
+    if(keyvalue < 0)
+        keyvalue *= -1;
+    return keyvalue%TABLE_SIZE;
+}
