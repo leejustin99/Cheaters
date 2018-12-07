@@ -43,8 +43,7 @@ int main(int argc, char *argv[])
     chunks.clear();
     int key = 0;
     HashTable *hm = new HashTable;
-    int count = 0;
-   for(int k = 2; k<files.size(); k++) {
+   for(int k = 2; k<files.size()-2; k++) {
 
        string fl = dir + "/" + files[k].c_str();
        ifstream file;
@@ -53,41 +52,40 @@ int main(int argc, char *argv[])
 
        if(file.is_open() && file.good()) {
            while (!file.eof()) {
-                cout << "Run: " << count << endl;
+                //cout << "Run: " << count << endl;
                string s;
                while (chunks.size() < atoi(argv[2])) {
                    file >> s;
                    chunks.push_back(s);
                }
                key = HashFunction(chunks);
-               hm->insertItem(files[k].c_str(), key);
-               print(chunks);
+               hm->insertItem(k, key);
                chunks.erase(chunks.begin());
-               count++;
            }
            file.close();
        }
 
    }
 
-       int CPA[files.size()][files.size()];
-       for (int i = 0; i < files.size(); i++) {
-
-           for (int j = i + 1; j < files.size(); j++) {
-               CPA[i][j] = hm->CollisionFinder(j, atoi(argv[3]));
-
-           }
+   /*/////2d array/////////////////////////////////////////////////////*/
+    bool flag1 = false;
+       int CPA[files.size()-2][files.size()-2];
+           for (int i = 2; i < files.size()-2; i++) {
+               for (int j = i+1; j < files.size()-2; j++) {
+                   CPA[i][j] = hm->CollisionFinder(i,j);
+                   if(CPA[i][j] > atoi(argv[3]))
+                       if(hm->Find(i) != 0 && hm->Find(i) != 1 && hm->Find(j) != 0 && hm->Find(j) != 1 && hm->Find(i) != hm->Find(j) && flag1 == false)
+                       {
+                           cout << CPA[i][j] / 2 << ": " << files[hm->Find(i)].c_str() << "  " << files[hm->Find(j)].c_str() << endl;
+                           flag1 = true;
+                       }
+               }
+               flag1 = false;
 
        }
+    /*//////////////////////////////////////////////////////////////////*/
 
 
-       for (int i = 0; i < files.size(); i++) {
-           for (int j = i + 1; j < files.size(); j++) {
-               //if (CPA[i][j] != 0) {
-                   cout << CPA[i][j] << ":" << hm->Find(i) <<"  " << hm->Find(j) << endl;
-               //}
-           }
-       }
     return 0;
 }
 
